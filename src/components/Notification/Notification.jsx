@@ -1,6 +1,6 @@
 function Notification() {
   return (
-    <div>
+    <div style={{ textAlign: 'center', fontSize: '24px', color: '#777' }}>
       <p>No feedback yet</p>
     </div>
   );

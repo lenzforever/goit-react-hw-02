@@ -6,54 +6,41 @@ import Feedback from "./components/Feedback/Feedback";
 import Notification from "./components/Notification/Notification";
 
 function App() {
-  const [options, setOptions] = useState(() => {
-    const savedOptions = window.localStorage.getItem("options");
-
-    if (savedOptions !== null) {
-      return JSON.parse(savedOptions);
-    }
-
-    return {
-      good: 0,
-      neutral: 0,
-      bad: 0,
-    };
+  const [feedback, setFeedback] = useState(() => {
+    const savedFeedback = window.localStorage.getItem("feedbackData");
+    return savedFeedback ? JSON.parse(savedFeedback) : { good: 0, neutral: 0, bad: 0 };
   });
 
   useEffect(() => {
-    window.localStorage.setItem("options", JSON.stringify(options));
-  }, [options]);
+    window.localStorage.setItem("feedbackData", JSON.stringify(feedback));
+  }, [feedback]);
 
-  const totalFeedback = options.good + options.neutral + options.bad;
-  const positiveFeedback = Math.round((options.good / totalFeedback) * 100);
+  const getTotal = feedback.good + feedback.neutral + feedback.bad;
+  const positivePercentage = getTotal ? Math.round((feedback.good / getTotal) * 100) : 0;
 
-  const updateFeedback = (feedbackType) => {
-    setOptions({ ...options, [feedbackType]: options[feedbackType] + 1 });
+  const handleFeedback = (type) => {
+    setFeedback((prevState) => ({ ...prevState, [type]: prevState[type] + 1 }));
   };
 
-  const resetFeedback = () => {
-    setOptions({
-      good: 0,
-      neutral: 0,
-      bad: 0,
-    });
+  const handleReset = () => {
+    setFeedback({ good: 0, neutral: 0, bad: 0 });
   };
 
   return (
     <div>
       <Description />
       <Options
-        total={totalFeedback}
-        update={updateFeedback}
-        reset={resetFeedback}
+        total={getTotal}
+        update={handleFeedback}
+        reset={handleReset}
       />
-      {totalFeedback ? (
+      {getTotal > 0 ? (
         <Feedback
-          good={options.good}
-          neutral={options.neutral}
-          bad={options.bad}
-          totalFeedback={totalFeedback}
-          positiveFeedback={positiveFeedback}
+          good={feedback.good}
+          neutral={feedback.neutral}
+          bad={feedback.bad}
+          totalFeedback={getTotal}
+          positiveFeedback={positivePercentage}
         />
       ) : (
         <Notification />
